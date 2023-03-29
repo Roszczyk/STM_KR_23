@@ -172,14 +172,14 @@ void EXTI4_15_IRQHandler(void)
 void TIM2_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM2_IRQn 0 */
-	extern int* xIndex;
+	extern int x;
 	extern int* tIndex;
   /* USER CODE END TIM2_IRQn 0 */
   HAL_TIM_IRQHandler(&htim2);
   /* USER CODE BEGIN TIM2_IRQn 1 */
   if(*tIndex == 0){
 	  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
-	  *tIndex=*xIndex;
+	  *tIndex=x;
   }
   else *tIndex=*tIndex-1;
   /* USER CODE END TIM2_IRQn 1 */

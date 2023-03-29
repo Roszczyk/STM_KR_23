@@ -27,23 +27,23 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  11 .ARM.attributes 00000028  00000000  00000000  0002001c  2**0
                   CONTENTS, READONLY
- 12 .debug_info   00007652  00000000  00000000  00020044  2**0
+ 12 .debug_info   00007650  00000000  00000000  00020044  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 00001462  00000000  00000000  00027696  2**0
+ 13 .debug_abbrev 00001475  00000000  00000000  00027694  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_aranges 000007c8  00000000  00000000  00028af8  2**3
+ 14 .debug_aranges 000007c8  00000000  00000000  00028b10  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_ranges 00000720  00000000  00000000  000292c0  2**3
+ 15 .debug_ranges 00000720  00000000  00000000  000292d8  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  000137f2  00000000  00000000  000299e0  2**0
+ 16 .debug_macro  000137f2  00000000  00000000  000299f8  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   0000838a  00000000  00000000  0003d1d2  2**0
+ 17 .debug_line   00008382  00000000  00000000  0003d1ea  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    0007ba23  00000000  00000000  0004555c  2**0
+ 18 .debug_str    0007ba23  00000000  00000000  0004556c  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000050  00000000  00000000  000c0f7f  2**0
+ 19 .comment      00000050  00000000  00000000  000c0f8f  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  00001ba0  00000000  00000000  000c0fd0  2**2
+ 20 .debug_frame  00001ba0  00000000  00000000  000c0fe0  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -1252,7 +1252,7 @@ void TIM2_IRQHandler(void)
  80007e0:	b580      	push	{r7, lr}
  80007e2:	af00      	add	r7, sp, #0
   /* USER CODE BEGIN TIM2_IRQn 0 */
-	extern int* xIndex;
+	extern int x;
 	extern int* tIndex;
   /* USER CODE END TIM2_IRQn 0 */
   HAL_TIM_IRQHandler(&htim2);
@@ -1265,40 +1265,40 @@ void TIM2_IRQHandler(void)
  80007ee:	681b      	ldr	r3, [r3, #0]
  80007f0:	681b      	ldr	r3, [r3, #0]
  80007f2:	2b00      	cmp	r3, #0
- 80007f4:	d10c      	bne.n	8000810 <TIM2_IRQHandler+0x30>
+ 80007f4:	d10b      	bne.n	800080e <TIM2_IRQHandler+0x2e>
 	  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
  80007f6:	23a0      	movs	r3, #160	; 0xa0
  80007f8:	05db      	lsls	r3, r3, #23
  80007fa:	2120      	movs	r1, #32
  80007fc:	0018      	movs	r0, r3
  80007fe:	f000 fb30 	bl	8000e62 <HAL_GPIO_TogglePin>
-	  *tIndex=*xIndex;
- 8000802:	4b0a      	ldr	r3, [pc, #40]	; (800082c <TIM2_IRQHandler+0x4c>)
- 8000804:	681a      	ldr	r2, [r3, #0]
- 8000806:	4b08      	ldr	r3, [pc, #32]	; (8000828 <TIM2_IRQHandler+0x48>)
- 8000808:	681b      	ldr	r3, [r3, #0]
- 800080a:	6812      	ldr	r2, [r2, #0]
- 800080c:	601a      	str	r2, [r3, #0]
+	  *tIndex=x;
+ 8000802:	4b09      	ldr	r3, [pc, #36]	; (8000828 <TIM2_IRQHandler+0x48>)
+ 8000804:	681b      	ldr	r3, [r3, #0]
+ 8000806:	4a09      	ldr	r2, [pc, #36]	; (800082c <TIM2_IRQHandler+0x4c>)
+ 8000808:	6812      	ldr	r2, [r2, #0]
+ 800080a:	601a      	str	r2, [r3, #0]
   }
   else *tIndex=*tIndex-1;
   /* USER CODE END TIM2_IRQn 1 */
 }
- 800080e:	e006      	b.n	800081e <TIM2_IRQHandler+0x3e>
+ 800080c:	e006      	b.n	800081c <TIM2_IRQHandler+0x3c>
   else *tIndex=*tIndex-1;
- 8000810:	4b05      	ldr	r3, [pc, #20]	; (8000828 <TIM2_IRQHandler+0x48>)
- 8000812:	681b      	ldr	r3, [r3, #0]
- 8000814:	681a      	ldr	r2, [r3, #0]
- 8000816:	4b04      	ldr	r3, [pc, #16]	; (8000828 <TIM2_IRQHandler+0x48>)
- 8000818:	681b      	ldr	r3, [r3, #0]
- 800081a:	3a01      	subs	r2, #1
- 800081c:	601a      	str	r2, [r3, #0]
+ 800080e:	4b06      	ldr	r3, [pc, #24]	; (8000828 <TIM2_IRQHandler+0x48>)
+ 8000810:	681b      	ldr	r3, [r3, #0]
+ 8000812:	681a      	ldr	r2, [r3, #0]
+ 8000814:	4b04      	ldr	r3, [pc, #16]	; (8000828 <TIM2_IRQHandler+0x48>)
+ 8000816:	681b      	ldr	r3, [r3, #0]
+ 8000818:	3a01      	subs	r2, #1
+ 800081a:	601a      	str	r2, [r3, #0]
 }
- 800081e:	46c0      	nop			; (mov r8, r8)
- 8000820:	46bd      	mov	sp, r7
- 8000822:	bd80      	pop	{r7, pc}
+ 800081c:	46c0      	nop			; (mov r8, r8)
+ 800081e:	46bd      	mov	sp, r7
+ 8000820:	bd80      	pop	{r7, pc}
+ 8000822:	46c0      	nop			; (mov r8, r8)
  8000824:	20000038 	.word	0x20000038
  8000828:	2000000c 	.word	0x2000000c
- 800082c:	20000004 	.word	0x20000004
+ 800082c:	20000000 	.word	0x20000000
 
 08000830 <SystemInit>:
   * @brief  Setup the microcontroller system.
