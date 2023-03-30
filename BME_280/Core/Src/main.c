@@ -22,6 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "bme280.h"
+#include <string.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -44,8 +45,10 @@ SPI_HandleTypeDef hspi1;
 
 TIM_HandleTypeDef htim2;
 
-/* USER CODE BEGIN PV */
+UART_HandleTypeDef huart2;
 
+/* USER CODE BEGIN PV */
+uint8_t znak;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -53,16 +56,23 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_SPI1_Init(void);
+static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
-
+int8_t stream_sensor_data_normal_mode(struct bme280_dev *dev);
+//static int8_t null_ptr_check(const struct bme280_dev *dev);
+void print_sensor_data(struct bme280_data *comp_data);
 int8_t user_spi_write(uint8_t reg_addr, uint8_t *reg_data, uint32_t len, void *intf_ptr);
 int8_t user_spi_read(uint8_t reg_addr, uint8_t *reg_data, uint32_t len, void *intf_ptr);
 void user_delay_us(uint32_t period, void *intf_ptr);
+void tx_com(uint8_t *tx_buffer, uint16_t len);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+#define CS_up_GPIO_Port SPI1_CS_GPIO_Port
+#define CS_up_Pin SPI1_CS_Pin
+#define SENSOR_BUS hspi1;
+uint8_t tx_buffer[1000];
 /* USER CODE END 0 */
 
 /**
@@ -95,6 +105,7 @@ int main(void)
   MX_GPIO_Init();
   MX_TIM2_Init();
   MX_SPI1_Init();
+  MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
   struct bme280_dev dev;
   int8_t rslt = BME280_OK;
@@ -106,13 +117,34 @@ int main(void)
   dev.write = user_spi_write;
   dev.delay_us = user_delay_us;
 
+  /*TEST*/
+  sprintf((char*)tx_buffer, "%d\n", rslt);
+  tx_com(tx_buffer, strlen((char const*)tx_buffer));
+  /*TEST*/
+
   rslt = bme280_init(&dev);
+  if (rslt != BME280_OK)
+  {
+	  sprintf((char*)tx_buffer, "Error - BME280 not detected %d\n", rslt);
+	  tx_com(tx_buffer, strlen((char const*)tx_buffer));
+	  while(1);
+  }
+
+  dev.settings.filter = BME280_FILTER_COEFF_2;
+  dev.settings.osr_p = BME280_OVERSAMPLING_2X;
+  dev.settings.osr_h = BME280_OVERSAMPLING_2X;
+  dev.settings.osr_t = BME280_OVERSAMPLING_8X;
+  dev.settings.standby_time = BME280_STANDBY_TIME_125_MS;
+
+  sprintf((char*)tx_buffer, "Initialization successful\n");
+  tx_com(tx_buffer, strlen((char const*)tx_buffer));
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  stream_sensor_data_normal_mode(&dev);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -128,6 +160,7 @@ void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
   /** Configure the main internal regulator output voltage
   */
@@ -159,6 +192,12 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART2;
+  PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
+  {
+    Error_Handler();
+  }
 }
 
 /**
@@ -181,8 +220,8 @@ static void MX_SPI1_Init(void)
   hspi1.Init.Mode = SPI_MODE_MASTER;
   hspi1.Init.Direction = SPI_DIRECTION_2LINES;
   hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
-  hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
-  hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
+  hspi1.Init.CLKPolarity = SPI_POLARITY_HIGH;
+  hspi1.Init.CLKPhase = SPI_PHASE_2EDGE;
   hspi1.Init.NSS = SPI_NSS_SOFT;
   hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
@@ -245,23 +284,114 @@ static void MX_TIM2_Init(void)
 }
 
 /**
+  * @brief USART2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART2_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART2_Init 0 */
+
+  /* USER CODE END USART2_Init 0 */
+
+  /* USER CODE BEGIN USART2_Init 1 */
+
+  /* USER CODE END USART2_Init 1 */
+  huart2.Instance = USART2;
+  huart2.Init.BaudRate = 115200;
+  huart2.Init.WordLength = UART_WORDLENGTH_8B;
+  huart2.Init.StopBits = UART_STOPBITS_1;
+  huart2.Init.Parity = UART_PARITY_NONE;
+  huart2.Init.Mode = UART_MODE_TX_RX;
+  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart2.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+  huart2.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  if (HAL_UART_Init(&huart2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART2_Init 2 */
+
+  /* USER CODE END USART2_Init 2 */
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
   */
 static void MX_GPIO_Init(void)
 {
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
 /* USER CODE BEGIN MX_GPIO_Init_1 */
 /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOA_CLK_ENABLE();
 
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(SPI1_CS_GPIO_Port, SPI1_CS_Pin, GPIO_PIN_SET);
+
+  /*Configure GPIO pin : SPI1_CS_Pin */
+  GPIO_InitStruct.Pin = SPI1_CS_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(SPI1_CS_GPIO_Port, &GPIO_InitStruct);
+
 /* USER CODE BEGIN MX_GPIO_Init_2 */
 /* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */
+int8_t stream_sensor_data_normal_mode(struct bme280_dev *dev)
+{
+	int8_t rslt;
+	uint8_t settings_sel;
+	struct bme280_data comp_data;
+
+	/* Recommended mode of operation: Indoor navigation */
+	dev->settings.osr_h = BME280_OVERSAMPLING_1X;
+	dev->settings.osr_p = BME280_OVERSAMPLING_16X;
+	dev->settings.osr_t = BME280_OVERSAMPLING_2X;
+	dev->settings.filter = BME280_FILTER_COEFF_16;
+	dev->settings.standby_time = BME280_STANDBY_TIME_62_5_MS;
+
+	settings_sel = BME280_OSR_PRESS_SEL;
+	settings_sel |= BME280_OSR_TEMP_SEL;
+	settings_sel |= BME280_OSR_HUM_SEL;
+	settings_sel |= BME280_STANDBY_SEL;
+	settings_sel |= BME280_FILTER_SEL;
+	rslt = bme280_set_sensor_settings(settings_sel, dev);
+	rslt = bme280_set_sensor_mode(BME280_NORMAL_MODE, dev);
+
+	//printf("Temperature, Pressure, Humidity\r\n");
+	while (1) {
+		/* Delay while the sensor completes a measurement */
+		dev->delay_us(70, dev->intf_ptr);
+		rslt = bme280_get_sensor_data(BME280_ALL, &comp_data, dev);
+		print_sensor_data(&comp_data);
+	}
+
+	return rslt;
+}
+
+void print_sensor_data(struct bme280_data *comp_data)
+{
+#ifdef BME280_FLOAT_ENABLE
+		sprintf((char*)tx_buffer, "%0.2f, %0.2f, %0.2f\r\n", comp_data->temperature, comp_data->pressure, comp_data->humidity);
+		tx_com(tx_buffer, strlen((char const*)tx_buffer));
+        //printf("%0.2f, %0.2f, %0.2f\r\n",comp_data->temperature, comp_data->pressure, comp_data->humidity);
+#else
+		sprintf((char*)tx_buffer, "%ld, %ld, %ld\r\n", comp_data->temperature, comp_data->pressure, comp_data->humidity);
+		tx_com(tx_buffer, strlen((char const*)tx_buffer));
+        //printf("%ld, %ld, %ld\r\n",comp_data->temperature, comp_data->pressure, comp_data->humidity);
+#endif
+}
+
 void user_delay_us(uint32_t period, void *intf_ptr)
 {
 	HAL_Delay(period);
@@ -270,6 +400,12 @@ void user_delay_us(uint32_t period, void *intf_ptr)
 int8_t user_spi_read(uint8_t reg_addr, uint8_t *reg_data, uint32_t len, void *intf_ptr)
 {
     int8_t rslt = 0; /* Return 0 for Success, non-zero for failure */
+    reg_addr |= 0x80;
+    HAL_GPIO_WritePin(CS_up_GPIO_Port, CS_up_Pin, GPIO_PIN_RESET);
+    HAL_SPI_Transmit(intf_ptr, &reg_addr, 1, 1000);
+    HAL_SPI_Receive(intf_ptr, reg_data, len, 1000);
+    HAL_GPIO_WritePin(CS_up_GPIO_Port, CS_up_Pin, GPIO_PIN_SET);
+
 
     return rslt;
 }
@@ -277,8 +413,16 @@ int8_t user_spi_read(uint8_t reg_addr, uint8_t *reg_data, uint32_t len, void *in
 int8_t user_spi_write(uint8_t reg_addr, uint8_t *reg_data, uint32_t len, void *intf_ptr)
 {
     int8_t rslt = 0; /* Return 0 for Success, non-zero for failure */
-
+    HAL_GPIO_WritePin(CS_up_GPIO_Port, CS_up_Pin, GPIO_PIN_RESET);
+    HAL_SPI_Transmit(intf_ptr, &reg_addr, 1, 1000);
+    HAL_SPI_Transmit(intf_ptr, reg_data, len, 1000);
+    HAL_GPIO_WritePin(CS_up_GPIO_Port, CS_up_Pin, GPIO_PIN_SET);
     return rslt;
+}
+
+void tx_com(uint8_t *tx_buffer, uint16_t len)
+{
+	HAL_UART_Transmit(&huart2, tx_buffer, len, 1000);
 }
 /* USER CODE END 4 */
 

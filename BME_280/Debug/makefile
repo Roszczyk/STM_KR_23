@@ -60,8 +60,8 @@ all: main-build
 main-build: BME_280.elf secondary-outputs
 
 # Tool invocations
-BME_280.elf BME_280.map: $(OBJS) $(USER_OBJS) C:\Users\natha\OneDrive\Pulpit\BME_280\STM32L073RZTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "BME_280.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0plus -T"C:\Users\natha\OneDrive\Pulpit\BME_280\STM32L073RZTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="BME_280.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+BME_280.elf BME_280.map: $(OBJS) $(USER_OBJS) C:\Users\natha\OneDrive\Pulpit\BME.280\STM_KR_23\BME_280\STM32L073RZTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "BME_280.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0plus -T"C:\Users\natha\OneDrive\Pulpit\BME.280\STM_KR_23\BME_280\STM32L073RZTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="BME_280.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
