@@ -155,9 +155,9 @@ void EXTI4_15_IRQHandler(void)
   /* USER CODE BEGIN EXTI4_15_IRQn 1 */
   extern int* xIndex;
   extern int* tIndex;
-  if(*xIndex==1) {
-	  *xIndex=0;
-	  *tIndex=0;
+  if(*xIndex==0) {
+	  *xIndex=1;
+	  *tIndex=1;
   }
   else {
 	  *xIndex=1;

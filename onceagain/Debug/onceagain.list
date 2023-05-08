@@ -39,9 +39,9 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  17 .debug_line   00008382  00000000  00000000  0003d1ea  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    0007ba23  00000000  00000000  0004556c  2**0
+ 18 .debug_str    0007ba22  00000000  00000000  0004556c  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000050  00000000  00000000  000c0f8f  2**0
+ 19 .comment      00000050  00000000  00000000  000c0f8e  2**0
                   CONTENTS, READONLY
  20 .debug_frame  00001ba0  00000000  00000000  000c0fe0  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
@@ -651,10 +651,10 @@ void SystemClock_Config(void)
  8000510:	187b      	adds	r3, r7, r1
  8000512:	2200      	movs	r2, #0
  8000514:	621a      	str	r2, [r3, #32]
-  RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_5;
+  RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_3;
  8000516:	187b      	adds	r3, r7, r1
- 8000518:	22a0      	movs	r2, #160	; 0xa0
- 800051a:	0212      	lsls	r2, r2, #8
+ 8000518:	22c0      	movs	r2, #192	; 0xc0
+ 800051a:	01d2      	lsls	r2, r2, #7
  800051c:	625a      	str	r2, [r3, #36]	; 0x24
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
  800051e:	187b      	adds	r3, r7, r1
@@ -762,7 +762,7 @@ static void MX_TIM2_Init(void)
  80005a8:	4b1b      	ldr	r3, [pc, #108]	; (8000618 <MX_TIM2_Init+0xa4>)
  80005aa:	2200      	movs	r2, #0
  80005ac:	609a      	str	r2, [r3, #8]
-  htim2.Init.Period = 999;
+  htim2.Init.Period = 65535;
  80005ae:	4b1a      	ldr	r3, [pc, #104]	; (8000618 <MX_TIM2_Init+0xa4>)
  80005b0:	4a1a      	ldr	r2, [pc, #104]	; (800061c <MX_TIM2_Init+0xa8>)
  80005b2:	60da      	str	r2, [r3, #12]
@@ -833,7 +833,7 @@ static void MX_TIM2_Init(void)
  8000614:	bd80      	pop	{r7, pc}
  8000616:	46c0      	nop			; (mov r8, r8)
  8000618:	20000038 	.word	0x20000038
- 800061c:	000003e7 	.word	0x000003e7
+ 800061c:	0000ffff 	.word	0x0000ffff
 
 08000620 <MX_GPIO_Init>:
   * @brief GPIO Initialization Function
@@ -1202,21 +1202,21 @@ void EXTI4_15_IRQHandler(void)
   /* USER CODE BEGIN EXTI4_15_IRQn 1 */
   extern int* xIndex;
   extern int* tIndex;
-  if(*xIndex==1) {
+  if(*xIndex==0) {
  80007a6:	4b0c      	ldr	r3, [pc, #48]	; (80007d8 <EXTI4_15_IRQHandler+0x40>)
  80007a8:	681b      	ldr	r3, [r3, #0]
  80007aa:	681b      	ldr	r3, [r3, #0]
- 80007ac:	2b01      	cmp	r3, #1
+ 80007ac:	2b00      	cmp	r3, #0
  80007ae:	d108      	bne.n	80007c2 <EXTI4_15_IRQHandler+0x2a>
-	  *xIndex=0;
+	  *xIndex=1;
  80007b0:	4b09      	ldr	r3, [pc, #36]	; (80007d8 <EXTI4_15_IRQHandler+0x40>)
  80007b2:	681b      	ldr	r3, [r3, #0]
- 80007b4:	2200      	movs	r2, #0
+ 80007b4:	2201      	movs	r2, #1
  80007b6:	601a      	str	r2, [r3, #0]
-	  *tIndex=0;
+	  *tIndex=1;
  80007b8:	4b08      	ldr	r3, [pc, #32]	; (80007dc <EXTI4_15_IRQHandler+0x44>)
  80007ba:	681b      	ldr	r3, [r3, #0]
- 80007bc:	2200      	movs	r2, #0
+ 80007bc:	2201      	movs	r2, #1
  80007be:	601a      	str	r2, [r3, #0]
   else {
 	  *xIndex=1;
@@ -2565,7 +2565,7 @@ __weak void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
  8000ed6:	0002      	movs	r2, r0
  8000ed8:	1dbb      	adds	r3, r7, #6
  8000eda:	801a      	strh	r2, [r3, #0]
-	  //HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+  UNUSED(GPIO_Pin);
 
   /* NOTE: This function Should not be modified, when the callback is needed,
            the HAL_GPIO_EXTI_Callback could be implemented in the user file
