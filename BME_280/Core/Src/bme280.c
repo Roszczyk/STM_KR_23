@@ -472,8 +472,10 @@ int8_t bme280_get_regs(uint8_t reg_addr, uint8_t *reg_data, uint16_t len, struct
         }
 
         /* Read the data  */
+        while(1){
         dev->intf_rslt = dev->read(reg_addr, reg_data, len, dev->intf_ptr);
-
+        HAL_Delay(200);
+        }
         /* Check for communication error */
         if (dev->intf_rslt != BME280_INTF_RET_SUCCESS)
         {
