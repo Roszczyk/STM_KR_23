@@ -193,7 +193,7 @@
  * These values are internal for API implementation. Don't relate this to
  * data sheet.
  */
-#define BME280_PRESS                              UINT8_C(1)
+//#define BME280_PRESS                              UINT8_C(1)
 #define BME280_TEMP                               UINT8_C(1 << 1)
 #define BME280_HUM                                UINT8_C(1 << 2)
 #define BME280_ALL                                UINT8_C(0x07)
@@ -298,7 +298,7 @@ typedef BME280_INTF_RET_TYPE (*bme280_write_fptr_t)(uint8_t reg_addr, const uint
  *                                  for interface related call backs
  *
  */
-typedef void (*bme280_delay_us_fptr_t)(uint32_t period, void *intf_ptr);
+//typedef void (*bme280_delay_us_fptr_t)(uint32_t period, void *intf_ptr);
 
 /*!
  * @brief Calibration data
@@ -367,11 +367,11 @@ struct bme280_calib_data
  * @brief bme280 sensor structure which comprises of temperature, pressure and
  * humidity data
  */
-#ifdef BME280_FLOAT_ENABLE
+//#ifdef BME280_FLOAT_ENABLE
 struct bme280_data
 {
     /*< Compensated pressure */
-    double pressure;
+    //double pressure;
 
     /*< Compensated temperature */
     double temperature;
@@ -379,19 +379,19 @@ struct bme280_data
     /*< Compensated humidity */
     double humidity;
 };
-#else
-struct bme280_data
-{
-    /*< Compensated pressure */
-    uint32_t pressure;
-
-    /*< Compensated temperature */
-    int32_t temperature;
-
-    /*< Compensated humidity */
-    uint32_t humidity;
-};
-#endif /*! BME280_USE_FLOATING_POINT */
+//#else
+//struct bme280_data
+//{
+//    /*< Compensated pressure */
+//    uint32_t pressure;
+//
+//    /*< Compensated temperature */
+//    int32_t temperature;
+//
+//    /*< Compensated humidity */
+//    uint32_t humidity;
+//};
+//#endif /*! BME280_USE_FLOATING_POINT */
 
 /*!
  * @brief bme280 sensor structure which comprises of uncompensated temperature,
@@ -400,7 +400,7 @@ struct bme280_data
 struct bme280_uncomp_data
 {
     /*< un-compensated pressure */
-    uint32_t pressure;
+    //uint32_t pressure;
 
     /*< un-compensated temperature */
     uint32_t temperature;
@@ -455,7 +455,7 @@ struct bme280_dev
     bme280_write_fptr_t write;
 
     /*< Delay function pointer */
-    bme280_delay_us_fptr_t delay_us;
+    //bme280_delay_us_fptr_t delay_us;
 
     /*< Trim data */
     struct bme280_calib_data calib_data;

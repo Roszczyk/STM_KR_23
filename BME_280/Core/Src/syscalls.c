@@ -79,7 +79,7 @@ __attribute__((weak)) int _read(int file, char *ptr, int len)
 
 __attribute__((weak)) int _write(int file, char *ptr, int len)
 {
-  (void)file;
+  //(void)file;
   int DataIdx;
 
   for (DataIdx = 0; DataIdx < len; DataIdx++)
@@ -89,11 +89,11 @@ __attribute__((weak)) int _write(int file, char *ptr, int len)
   return len;
 }
 
-int _close(int file)
-{
-  (void)file;
-  return -1;
-}
+//int _close(int file)
+//{
+//  (void)file;
+//  return -1;
+//}
 
 
 int _fstat(int file, struct stat *st)

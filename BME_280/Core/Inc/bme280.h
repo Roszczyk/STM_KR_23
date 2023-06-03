@@ -111,7 +111,7 @@ int8_t bme280_init(struct bme280_dev *dev);
  * @retval < 0 -> Fail.
  *
  */
-int8_t bme280_set_regs(uint8_t *reg_addr, const uint8_t *reg_data, uint8_t len, struct bme280_dev *dev);
+void bme280_set_regs(uint8_t *reg_addr, const uint8_t *reg_data, uint8_t len, struct bme280_dev *dev);
 
 /*!
  * \ingroup bme280ApiRegister
@@ -386,7 +386,7 @@ int8_t bme280_compensate_data(uint8_t sensor_comp,
  * @return delay required in milliseconds.
  *
  */
-uint32_t bme280_cal_meas_delay(const struct bme280_settings *settings);
+//uint32_t bme280_cal_meas_delay(const struct bme280_settings *settings);
 
 #ifdef __cplusplus
 }
